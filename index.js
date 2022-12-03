@@ -1,33 +1,68 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import { Router } from 'react-router';
-import Coordinator from './Coordinator';
-import Chairman from './Chairman';
-import Login from './login';
+class Node {
+	/// value;
+	/// next;
 
-import { BrowserRouter, Route,Routes } from 'react-router-dom';
+	constructor(value) {
+		this.value = value;
 
+		// TODO: Remove this when targeting Node.js 12.
+		this.next = undefined;
+	}
+}
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <BrowserRouter>
-    <Routes>
-      <Route index element={<App/>}/>
-      <Route path="/login" element ={<login/>}/>
-      <Route path="/Chairman" element ={<Chairman/>}/>
-      <Route path="/Coordinator" element ={<Coordinator/>}/>
-      {/* <Route exact path="/mail" render={() => {window.location.href="/mail.html"}} /> 
-      */}
+class Queue {
+	// TODO: Use private class fields when targeting Node.js 12.
+	// #_head;
+	// #_tail;
+	// #_size;
 
-      </Routes></BrowserRouter>
-  </React.StrictMode>
-);
+	constructor() {
+		this.clear();
+	}
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+	enqueue(value) {
+		const node = new Node(value);
+
+		if (this._head) {
+			this._tail.next = node;
+			this._tail = node;
+		} else {
+			this._head = node;
+			this._tail = node;
+		}
+
+		this._size++;
+	}
+
+	dequeue() {
+		const current = this._head;
+		if (!current) {
+			return;
+		}
+
+		this._head = this._head.next;
+		this._size--;
+		return current.value;
+	}
+
+	clear() {
+		this._head = undefined;
+		this._tail = undefined;
+		this._size = 0;
+	}
+
+	get size() {
+		return this._size;
+	}
+
+	* [Symbol.iterator]() {
+		let current = this._head;
+
+		while (current) {
+			yield current.value;
+			current = current.next;
+		}
+	}
+}
+
+module.exports = Queue;
